@@ -1,0 +1,2 @@
+# DESAFIO_EXERCICIO_LISTA_MERCADO_JAVASCRIPT
+ Exercicio em forma de desafio
