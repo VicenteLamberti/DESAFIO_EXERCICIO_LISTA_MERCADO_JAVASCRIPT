@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        #corpo
+        {
+            width: 700px;
+            margin: auto;
+            border: solid  2px black ;
+            box-shadow: 5px 5px gray;
+            padding: 10px;
+            font-style: normal;
+            font-family: cursive;
+        }
+
+        .inputs
+        {
+            margin: 5px;
+            border-radius: 5px;
+        }
+
+        .botao
+        {
+            background-color: rgb(75, 72, 72); 
+            margin: 5px;
+            color: white;
+            padding: 0.5px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1rem;
+            border-radius: 5px;
+        }
+
+        body
+        {
+            user-select: none;
+        }
+
+        #tabela2
+        {
+            margin:15px;
+            margin-left: 0px;
+        }
+
+        #tabela2 > thead > tr > td, #tabela2 > tbody > tr > td
+        {
+            padding: 5px;
+            border: solid 1px black;
+            text-align: center;
+        }
+
+    
+    </style>
+</head>
+<body>
+    <div id = "corpo">
+        
+    
+        <div class="inputs">ITEM</div>
+        <input class ="inputs" type="text" name="txtItem" id="txtItem">
+        
+        <div class="inputs">QUANTIDADE</div>
+        <input class ="inputs" type="number" name="txtQtd" id="txtQtd">
+        
+        <div class="inputs">PREÇO (CENTAVOS)</div>
+        <input class ="inputs" type="number" name="txtPreco" id="txtPreco"><br>
+        
+        <button class = "botao" class ="inputs" id = "adicionarItem" onclick="adicionarItem()">Adicionar Item a Lista</button>
+ 
+        <table id = "tabela2" class ="inputs">
+            <thead>
+                <tr>
+                    <td >ITEM</td><td >QUANTIDADE</td><td >PREÇO UNITÁRIO</td><td >PREÇO TOTAL</td>
+                </tr>
+            </thead>
+            
+            <tbody id="tabela"></tbody>
+        </table>
+        <hr>
+
+        <div class="inputs">Emails (Quantas pessoas irão dividir o valor da conta)</div>
+        <input class = "inputs" type="email" name="txtEmail" id="txtEmail"><button class = "botao" id = "adicionarEmail" onclick= "adicionarEmail()">Adicionar Email</button><br>
+      
+        <div><select class = "inputs" name="selectEmail" id="selectEmail" multiple style="width: 400px;"><option value=""></option></select></div>
+        <hr>
+
+        <button class = "botao" class="inputs" id = "calcular" onclick="calcular()">Calcular Valor da Compra</button>
+        <hr>
+
+        <div id = "resultado">Resultado</div>
+    </div>
+
+    
+    <script>
+        var item = document.getElementById("txtItem"); 
+        var listaItens=[];
+        var qtd = document.getElementById("txtQtd");
+        var qtdNumero;
+        var listaQtd=[];
+        var preco = document.getElementById("txtPreco");
+        var precoNumero;
+        var listaPreco=[];
+        var email = document.getElementById("txtEmail");
+        var listaEmail = [];
+        var precoTotal;
+        var listaPrecoTotal = [];
+        var precoCompraTotal=0;
+        var precoCompraTotalDividido=0;
+        var restoPrecoTotalDividido=0;
+        var precoCompraTotalDivididoMaisResto=0;
+        var mapaEmailTotal = new Map();
+        var resultado = document.getElementById("resultado");
+        var emailAdicionado = document.getElementById("emailAdicionado");
+        var verificacaoEmail = false;
+        var tabela = document.getElementById("tabela");
+        var selectEmail = document.getElementById("selectEmail");
+        
+        qtd.addEventListener("mouseout",function()
+        {
+            if(qtd.value.match(/[.,]/ig)) //Poderia ter sido number.isinteger
+            {
+                alert("Digite apenas valores Inteiros");
+                qtd.value="";
+            }
+        })
+
+        preco.addEventListener("mouseout",function()
+        {
+            if(preco.value.match(/[.,]/ig))
+            {
+                alert("Digite apenas valores Inteiros");
+                preco.value="";
+            }
+        })
+
+
+        function adicionarItem()
+        {
+            
+
+            if((item.value == "")||(qtd.value =="")||(preco.value == ""))
+            {
+                alert("Preencha os campos (Item,Quantidade,Preço) para adicionar um item na lista");
+            }
+            else
+            {
+                //------Item
+                listaItens.push(item.value.toUpperCase());
+                item.value = "";
+
+                //--------Quantidade---------------
+                qtdNumero = qtd.value;
+                qtdNumero = Number(qtdNumero);
+                listaQtd.push(qtd.value);
+                qtd.value="";
+
+                //---------preco--------------
+                precoNumero = preco.value;
+                precoNumero = Number(precoNumero);
+                listaPreco.push(preco.value);
+                precoTot();
+                preco.value="";
+            }
+            gerarLista()
+        }
+
+        function adicionarEmail()
+        {
+            
+            verificacaoEmail = false;
+                for(i=0;i<listaEmail.length;i++)
+                {
+                    if(email.value == listaEmail[i])
+                    {
+                        verificacaoEmail = true;
+                    }
+                }
+            
+            if(email.value == "")
+            {
+                alert("Adicione um email");
+            }
+            else if(verificacaoEmail==true)
+            {
+                alert("Este email já foi adicionado");
+            }
+            else
+            {
+                listaEmail.push(email.value);
+                email.value="";
+                resultado.innerText="";
+            }
+            
+            selectEmail.innerHTML="";
+            for(var current of listaEmail)
+            {
+                selectEmail.innerHTML += `<option>${current}</>`;
+            }
+        }
+
+        function precoTot()
+        {
+            precoTotal=qtdNumero*precoNumero;
+            listaPrecoTotal.push(precoTotal);
+        }
+
+        function gerarLista()
+        {
+            if((listaItens.length ==0)||(listaQtd.length ==0)||(listaPreco.length ==0))
+            {
+               return
+            }
+            else
+            {
+                tabela.innerHTML=''
+                for (var i=0; i<listaItens.length;i++)
+                {
+                    tabela.innerHTML+= `<tr><td >${listaItens[i]}</td> <td >${listaQtd[i]}</td> <td >${listaPreco[i]}</td> <td >${listaPrecoTotal[i]}</td></tr>`;
+                }
+            }
+        }
+        
+        function calcular()
+        {
+            if((listaPrecoTotal.length==0)||(listaEmail.length==0))
+            {
+                alert("Insira pelo menos um item e um email para calcular");
+            }
+            else
+            {
+                //Soma dos valores
+                precoCompraTotal=0;
+                for(var i = 0; i <listaPrecoTotal.length;i++)
+                {
+                    precoCompraTotal = precoCompraTotal+listaPrecoTotal[i];
+                }
+            
+                // Divisao
+                if((precoCompraTotal)%(listaEmail.length)==0)
+                {
+                    precoCompraTotalDividido = (precoCompraTotal/listaEmail.length);
+                    mapeamento();
+                }
+                else
+                {
+                    restoPrecoTotalDividido = ((precoCompraTotal)%(listaEmail.length));
+                    precoCompraTotalDividido = (precoCompraTotal/listaEmail.length);
+                    precoCompraTotalDividido = Math.trunc(precoCompraTotalDividido);
+                    precoCompraTotalDivididoMaisResto = precoCompraTotalDividido+restoPrecoTotalDividido;
+                    mapeamento();
+                }
+            }
+        }
+        
+        function info(valor,chave)
+        {
+            resultado.innerText += ("\nEmail: " + chave + " - Total a Pagar: "+ valor + " Centavos");
+        }
+        
+        function mapeamento()
+        {
+            if((precoCompraTotal)%(listaEmail.length)==0)
+            {
+                for (var i = 0; i<listaEmail.length;i++)
+                {
+                    mapaEmailTotal.set(listaEmail[i],precoCompraTotalDividido);
+                }
+            }
+            else
+            {
+                for (var i = 0; i<(listaEmail.length)-1;i++)
+                {
+                    mapaEmailTotal.set(listaEmail[i],precoCompraTotalDividido);
+                }
+
+                mapaEmailTotal.set(listaEmail[(listaEmail.length)-1],precoCompraTotalDivididoMaisResto);
+            }
+            resultado.innerText="";
+            mapaEmailTotal.forEach(info)
+        }
+    </script>
+</body>
+</html>
+
+
