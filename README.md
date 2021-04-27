@@ -1,2 +1,2 @@
 # DESAFIO_EXERCICIO_LISTA_MERCADO_JAVASCRIPT
- Exercicio em forma de desafio
+ Exercicio em forma de desafio - 01/02/2021
